@@ -63,40 +63,155 @@ Message : Notes
 
 ### enum ConnectionStatus
 
-`enum` : status
-
-`Invalid` : Invalid API key provided.
-
-`None` : No adapters or devices are detected.
-
-`Usb` : USB Adapters are detected.
-
-`Adapter` : Physical connection to device is established.
-
-`Device` : Device is connected and ready to send data.
-
+<table>
+    <tr>
+        <th><pre>enum</pre></th><th>status</th>
+    </tr>
+    <tr>
+        <td><pre>Invalid</pre></td><td>Invalid API key provided.</td>
+    </tr>
+    <tr>
+        <td><pre>None</pre></td><td>No adapters or devices are detected.</td>
+    </tr>
+    <tr>
+        <td><pre>Usb</pre></td><td>USB Adapters are detected.</td>
+    </tr>
+    <tr>
+        <td><pre>Adapter</pre></td><td>Physical connection to device is established.</td>
+    </tr>
+    <tr>
+        <td><pre>Device</pre></td><td>Device is connected and ready to send data.</td>
+    </tr>
+</table>
 
 ### enum DeviceIds.DeviceName
 
 Use `DeviceName` to manually specify the device your patient is using. Currently supported devices and their ids are listed below. Click on the links to go to sites where you can purchase the devices.
 
-Brand and Product Name : Relevant Enum DeviceName
-
-[LifeScan OneTouch UltraMini](http://www.amazon.com/OneTouch-Glucose-Monitoring-System-Silver/dp/B000KK8HBY) : `OneTouchUltraMini`
-
-[LifeScan OneTouch Select](http://www.solaramedicalsupplies.com/lifescan-onetouch-select-blood-glucose-meter) : `OneTouchSelect`
-
-[LifeScan OneTouch Ultra2](http://www.amazon.com/OneTouch-Ultra-Blood-Glucose-Lifescan/dp/B000O0FPY2) : `OneTouchUltra2`
-
-[LifeScan OneTouch UltraSmart](http://www.amazon.com/OneTouch-UltraSmart-Glucose-Monitoring-System/dp/B00008O2XL) : `OneTouchUltraSmart`
-
-[A&D Medical UA-767PC Automatic Blood Pressure Monitor](http://www.amazon.com/Medical-UA-767PC-Automatic-Pressure-Communication/dp/B00264GO1C) : `AndBloodPressureUS767PC`
-
-[A&D Medical UC-321PC Precision Scale](http://www.amazon.com/LifeSource-UC-321-Precision-Personal-Health/dp/B000B688P2) : `AndScaleUS321PC`
-
-[Omnis Health Embrace Talking Blood Glucose Meter](http://www.amazon.com/Omnis-Health-Embrace-Glucose-Audible/dp/B001C481TA) : `Embrace`
+<table>
+    <tr>
+        <th>Brand and Product Name</th><th>Relevant Enum DeviceName</th>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/OneTouch-Glucose-Monitoring-System-Silver/dp/B000KK8HBY">LifeScan OneTouch UltraMini</a></td><td><pre>OneTouchUltraMini</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.solaramedicalsupplies.com/lifescan-onetouch-select-blood-glucose-meter">LifeScan OneTouch Select</a></td><td><pre>OneTouchSelect</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/OneTouch-Ultra-Blood-Glucose-Lifescan/dp/B000O0FPY2">LifeScan OneTouch Ultra2</a></td><td><pre>OneTouchUltra2</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/OneTouch-UltraSmart-Glucose-Monitoring-System/dp/B00008O2XL">LifeScan OneTouch UltraSmart</a></td><td><pre>OneTouchUltraSmart</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/Medical-UA-767PC-Automatic-Pressure-Communication/dp/B00264GO1C">A&D Medical UA-767PC Automatic Blood Pressure Monitor</a></td><td><pre>AndBloodPressureUS767PC</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/LifeSource-UC-321-Precision-Personal-Health/dp/B000B688P2">A&D Medical UC-321PC Precision Scale</a></td><td><pre>AndScaleUS321PC</pre></td>
+    </tr>
+    <tr>
+        <td><a href="http://www.amazon.com/Omnis-Health-Embrace-Glucose-Audible/dp/B001C481TA">Omnis Health Embrace Talking Blood Glucose Meter</a></td><td><pre>Embrace</pre></td>
+    </tr>
+</table>
 
 
 ### com.infometers.common.records
 
 The `Records` object type is designed to provide standardized record values for data coming from any device. The general object type has a timestamp. There are `Records` objects for each measurement type:
+
+#### com.infometers.devices.records
+
+<table>
+    <tr>
+        <th>Name</th><th>Type</th><th>Notes</th>
+    </tr>
+    <tr>
+        <td><pre>mDate</pre></td><td><pre>private Long</pre></td><td><pre>public Long getDate() {
+    return mDate;
+}
+public void setDate(Long mDate) {
+    this.mDate = mDate;
+}
+</pre>
+</tr>
+    <tr>
+        <td><pre>mMeasurementType</pre></td><td><pre>private int</pre></td><td><pre>public int getMeasurementType() {
+    return mMeasurementType;
+}
+public void setMeasurementType(int value) {
+    this.mMeasurementType = value;
+}
+</pre>
+</tr>
+</table>
+
+#### com.infometers.devices.records.bloodpressure
+
+<table>
+    <tr>
+        <th>Name</th><th>Type</th><th>Notes</th>
+    </tr>
+    <tr>
+        <td><pre>mSys</pre></td><td><pre>protected int</pre></td><td><pre>public int getSys() {
+    return mSys;
+}
+public void setSys(int value) {
+    this.mSys = value;
+}
+</pre>
+</tr>
+    <tr>
+        <td><pre>mDia</pre></td><td><pre>protected int</pre></td><td><pre>public int getDia() {
+    return mDia;
+}
+public void setDia(int value) {
+    this.mDia = value;
+}
+</pre>
+</tr>
+    <tr>
+        <td><pre>mPul</pre></td><td><pre>protected int</pre></td><td><pre>public int getPul() {
+    return mPul;
+}
+public void setPul(int value) {
+    this.mPul = value;
+}
+</pre>
+</tr>
+</table>
+
+#### com.infometers.devices.records.bloodglucose
+
+<table>
+    <tr>
+        <th>Name</th><th>Type</th><th>Notes</th>
+    </tr>
+    <tr>
+        <td><pre>mValue</pre></td><td><pre>protected int</pre></td><td><pre>public int getValue() {
+    return mValue;
+}
+public void setValue(int value) {
+    this.mValue = value;
+}
+</pre>
+</tr>
+    <tr>
+        <td><pre>mNote</pre></td><td><pre>protected int</pre></td><td><pre>public String getNote() {
+    return mNote;
+}
+public void setNote(String note) {
+    this.mNote = note;
+}
+</pre>
+</tr>
+    <tr>
+        <td><pre>mType</pre></td><td><pre>protected int</pre></td><td><pre>public Types getType() {
+    return mType;
+}
+public void setType(Types value) {
+    mType = value;
+}
+</pre>
+</tr>
+</table>
