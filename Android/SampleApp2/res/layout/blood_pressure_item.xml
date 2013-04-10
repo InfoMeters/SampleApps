@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:verticalScrollbarPosition="right"
+    android:background="@color/White"
+    android:baselineAligned="true"
+    android:orientation="horizontal" >
+
+    <!-- Systolic -->
+    <TextView
+        android:id="@+id/textViewSystolic"
+        style="@style/textViewColumnStyleValues"
+        android:text="109" >
+    </TextView>
+
+    <!-- Diastolic -->
+    <TextView
+        android:id="@+id/textViewDiastolic"
+        style="@style/textViewColumnStyleValues"
+        android:text="62" >
+    </TextView>
+
+    <!-- Pulse -->
+    <TextView
+        android:id="@+id/textViewPulse"
+        style="@style/textViewColumnStyleValues"
+        android:text="69" >
+    </TextView>
+
+    <!-- DATE and TIME -->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textViewDate"
+	        style="@style/textViewColumnStyleDate"
+            android:text="02/23/2012"
+            >
+        </TextView>
+
+        <TextView
+            android:id="@+id/textViewTime"
+        	style="@style/textViewColumnStyleTime"
+            android:text="11:06:06 AM"
+            >
+        </TextView>
+    </LinearLayout>
+
+</LinearLayout>

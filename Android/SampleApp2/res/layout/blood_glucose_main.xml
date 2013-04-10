@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="@drawable/wallpaper"
+              android:orientation="vertical">
+
+    <ProgressBar
+            android:id="@+id/progressBarConnection"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <!-- Local Buttons -->
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:orientation="horizontal">
+
+        <Button
+                android:id="@+id/deviceConnect"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Connect Meter"
+                android:text="Connect"
+                android:onClick="onButtonConnectClicked"
+                />
+
+        <Button
+                android:id="@+id/deviceOpen"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Open Meter"
+                android:text="Open"
+                android:onClick="onButtonOpenClicked"
+                />
+        <Button
+                android:id="@+id/deviceRead"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Read Meter Data"
+                android:text="Read"
+                android:onClick="onButtonReadClicked"
+                />
+
+    </LinearLayout>
+    <!-- Local Buttons -->
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:orientation="horizontal">
+
+        <Button
+                android:id="@+id/buttonSmartRead"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Smart Read"
+                android:onClick="onButtonSmartReadClicked"
+                />
+        <Button
+                android:id="@+id/clearData"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Clear Local Data"
+                android:text="Clear"
+                android:onClick="onButtonClearDataClicked"
+                />
+        <Button
+                android:id="@+id/saveData"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Export To A File"
+                android:text="Export"
+                android:onClick="onButtonSaveDataClicked"
+                />
+    </LinearLayout>
+
+    <!-- HV buttons -->
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dip"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="3dip"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+        <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="Select Account"
+                android:textSize="20dip"/>
+
+        <Button
+                android:id="@+id/connectHV"
+                android:layout_width="98dp"
+                android:layout_height="fill_parent"
+                android:layout_margin="1dip"
+                android:hint="Sync with HealthVault"
+                android:text="Sync"/>
+    </LinearLayout>
+
+    <!-- STATUS -->
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dip"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/statusValue"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Test"
+                android:textColor="@color/White"
+                android:textSize="20dip"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="1dip"
+                android:layout_weight="1"
+                android:background="@drawable/textfield_bg"
+                android:orientation="vertical">
+
+            <ListView
+                    android:id="@android:id/list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@color/Lavender">
+            </ListView>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

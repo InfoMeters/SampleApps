@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center_horizontal"
+    android:background="@color/White"
+    android:baselineAligned="true"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/Id"
+        android:layout_width="32dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="123"
+        android:textColor="@color/Black"
+        android:textSize="18dp" >
+    </TextView>
+
+    <!--
+    <TextView
+        android:id="@+id/Type"
+        android:layout_width="0dp"
+        android:layout_height="24dip"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp"
+        android:layout_weight="1"
+        android:text="Type"
+        android:textColor="@color/Black"
+        >
+    </TextView>
+    -->
+
+    <TextView
+        android:id="@+id/Time"
+        android:layout_width="fill_parent"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:text="02/23/2012 11:06:06 AM"
+        android:textColor="@color/Black"
+        android:textSize="18dp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/Value"
+        android:layout_width="66dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="118.0"
+        android:textColor="@color/black"
+        android:textSize="18dp" >
+    </TextView>
+
+    <!--
+    <TextView
+        android:id="@+id/Note"
+        android:layout_width="0dp"
+        android:layout_height="24dip"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:text="Note"
+        android:textColor="@color/Black"
+        >
+    </TextView>
+    -->
+
+</LinearLayout>

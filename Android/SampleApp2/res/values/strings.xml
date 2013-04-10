@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--     <string name="app_name">UltraMini Auto Logbook</string> -->
+    <string name="app_name">SampleApp2</string>
+    <string name="button_connect">Connect</string>
+    <string name="button_read">Read</string>
+    <string name="button_connectHV">Connect</string>
+    <string name="button_syncHV">Read</string>
+</resources>

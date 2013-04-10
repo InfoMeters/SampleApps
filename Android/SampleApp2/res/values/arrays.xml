@@ -1,0 +1,10 @@
+<resources>
+<string-array name="environment">
+ <item>PPE</item>
+ <item>PROD</item>
+</string-array>
+<string-array name="urls">
+ <item>https://platform.healthvault-ppe.com,https://account.healthvault-ppe.com</item>
+ <item>https://platform.healthvault.com,https://account.healthvault.com</item>
+</string-array>
+</resources>

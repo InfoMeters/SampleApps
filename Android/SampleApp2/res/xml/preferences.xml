@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+         <ListPreference
+                 android:title="Environment"
+                 android:summary="Choose PPE or PROD Environment"
+                 android:key="listPref"
+                 android:defaultValue="PPE"
+                 android:entries="@array/environment"
+				 android:entryValues="@array/urls" />
+                  />
+        <EditTextPreference
+                android:name="Master App Id"
+                android:summary="Master App Id for the application"
+                android:defaultValue="c6ba979f-c342-4408-a2bc-0dfb43b2bf8d"
+                android:title="Master App Id"
+                android:key="masterAppId" />
+</PreferenceScreen>
