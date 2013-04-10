@@ -79,8 +79,9 @@ Message : Notes
 ### enum DeviceIds.DeviceName
 
 Use `DeviceName` to manually specify the device your patient is using. Currently supported devices and their ids are listed below. Click on the links to go to sites where you can purchase the devices.
- 
+
 Brand and Product Name : Relevant Enum DeviceName
+
 [LifeScan OneTouch UltraMini](http://www.amazon.com/OneTouch-Glucose-Monitoring-System-Silver/dp/B000KK8HBY) : `OneTouchUltraMini`
 
 [LifeScan OneTouch Select](http://www.solaramedicalsupplies.com/lifescan-onetouch-select-blood-glucose-meter) : `OneTouchSelect`
