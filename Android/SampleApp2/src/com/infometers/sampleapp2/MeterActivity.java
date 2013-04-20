@@ -174,8 +174,8 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
                 case R.id.action_and_bloodpressure_us767pc:
                     setDevice(DeviceIds.AndBloodPressureUS767PC);
                     break;
-                case R.id.action_and_scale_us321pc:
-                    setDevice(DeviceIds.AndScaleUS321PC);
+                case R.id.action_and_scale_uc321pl:
+                    setDevice(DeviceIds.AndScaleUC321PL);
                     break;
                 case R.id.action_embrace:
                     setDevice(DeviceIds.Embrace);
