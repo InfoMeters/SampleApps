@@ -304,6 +304,10 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
                 resourceHeader = R.layout.blood_pressure_header;
                 resourceItem = R.layout.blood_pressure_item;
                 break;
+            case Scale:
+                resourceHeader = R.layout.scale_header;
+                resourceItem = R.layout.scale_item;
+                break;
         }
         ListView listView = getListView();
         if (listView.getHeaderViewsCount() > 0)
