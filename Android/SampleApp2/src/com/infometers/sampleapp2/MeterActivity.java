@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
+import com.infometers.devices.Communicator;
 import com.infometers.devices.Converter;
 import com.infometers.sdk.Device;
 import com.infometers.enums.ConnectionStatus;
@@ -56,6 +57,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     // SDK handle
     private Device mDevice = new Device();
+    private DeviceIds mDeviceId = DeviceIds.OneTouchUltraMini;
 
     //
     private MeterArrayAdapter<Record> mAdapter;
@@ -272,7 +274,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         // All objects are from android.context.Context
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("deviceType", mDevice.getDeviceId().toString());
+        editor.putString("deviceType", mDeviceId.toString());
 
         // Commit the edits!
         editor.commit();
@@ -284,7 +286,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     private void setDevice() {
-        DeviceIds deviceId = mDevice.getDeviceId();
+        DeviceIds deviceId = mDeviceId;
         setTitle("Infometers SampleApp2 - " + deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
         onStatusMessage(String.format("Device Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
@@ -353,7 +355,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     private void onExport() {
-        // mDevice.onExport();
+        // mUsbDevice.onExport();
     }
 
     String message;
