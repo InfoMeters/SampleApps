@@ -51,18 +51,19 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //region Private Members
 
+    // SDK handle
+    private DeviceManager mDeviceManager = new DeviceManager();
+    private Device mDevice = null;
+    private DeviceIds mDeviceId = DeviceIds.OneTouchUltraMini;
+
+    // UI
     private TextView mTextViewStatus;
     private View mHeader = null;
     private ProgressBar mProgressBarConnection;
 
-    // SDK handle
-    private DeviceManager mDeviceManager = new DeviceManager();
-    private DeviceIds mDeviceId = DeviceIds.OneTouchUltraMini;
-
-    //
+    // DB
     private MeterArrayAdapter<Record> mAdapter;
     private static final List<Record> mRecords = new ArrayList<Record>();
-    private Device mDevice = null;
 
     //endregion
 
