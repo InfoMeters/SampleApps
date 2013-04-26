@@ -62,6 +62,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     //
     private MeterArrayAdapter<Record> mAdapter;
     private static final List<Record> mRecords = new ArrayList<Record>();
+    private Communicator mCommunicator = null;
 
     //endregion
 
@@ -137,7 +138,6 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     protected void onResume() {
         super.onResume();
         restorePreferences();
-        setDevice();
         showRecords();
     }
 
@@ -153,6 +153,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        DeviceIds deviceId = DeviceIds.None;
         try {
             switch (item.getItemId()) {
                 // If home icon is clicked return to blood_glucose_main Activity
@@ -162,25 +163,25 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
                     startActivity(intent);
                     break;
                 case R.id.action_onetouch_ultramini:
-                    setDevice(DeviceIds.OneTouchUltraMini);
+                    deviceId = DeviceIds.OneTouchUltraMini;
                     break;
                 case R.id.action_onetouch_select:
-                    setDevice(DeviceIds.OneTouchSelect);
+                    deviceId = DeviceIds.OneTouchSelect;
                     break;
                 case R.id.action_onetouch_ultra2:
-                    setDevice(DeviceIds.OneTouchUltra2);
+                    deviceId = DeviceIds.OneTouchUltra2;
                     break;
                 case R.id.action_onetouch_ultrasmart:
-                    setDevice(DeviceIds.OneTouchUltraSmart);
+                    deviceId = DeviceIds.OneTouchUltraSmart;
                     break;
                 case R.id.action_and_bloodpressure_us767pc:
-                    setDevice(DeviceIds.AndBloodPressureUS767PC);
+                    deviceId = DeviceIds.AndBloodPressureUS767PC;
                     break;
                 case R.id.action_and_scale_uc321pl:
-                    setDevice(DeviceIds.AndScaleUC321PL);
+                    deviceId = DeviceIds.AndScaleUC321PL;
                     break;
                 case R.id.action_embrace:
-                    setDevice(DeviceIds.Embrace);
+                    deviceId = DeviceIds.Embrace;
                     break;
                 default:
                     break;
@@ -188,7 +189,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-
+        setDevice(deviceId);
         return true;
     }
 
@@ -231,15 +232,15 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
 
     public void onButtonConnectClicked(View v) {
-        mDevice.connect();
+        mDevice.connect(mCommunicator);
     }
 
     public void onButtonOpenClicked(View v) {
-        mDevice.open();
+        mCommunicator.open();
     }
 
     public void onButtonReadClicked(View v) {
-        onRead();
+        onRead(mCommunicator);
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -251,7 +252,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     public void onButtonSmartReadClicked(View v) {
-        onSmartRead();
+        onSmartRead(mCommunicator);
     }
 
     //endregion
@@ -265,7 +266,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         if (deviceId == DeviceIds.None)
             deviceId = DeviceIds.OneTouchUltraMini;
 
-        mDevice.setDevice(deviceId);
+        setDevice(deviceId);
     }
 
     private void savePreferences() {
@@ -281,12 +282,11 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     private void setDevice(DeviceIds deviceId) {
-        mDevice.setDevice(deviceId);
-        setDevice();
-    }
+        if(deviceId == DeviceIds.None)
+            return;
 
-    private void setDevice() {
-        DeviceIds deviceId = mDeviceId;
+        mDeviceId = deviceId;
+        mCommunicator = mDevice.createCommunicator(deviceId);
         setTitle("Infometers SampleApp2 - " + deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
         onStatusMessage(String.format("Device Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
@@ -323,9 +323,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         setListAdapter(mAdapter);
     }
 
-    private void onRead() {
+    private void onRead(Communicator communicator) {
         try {
-            List<Record> records = mDevice.readRecords();
+            List<Record> records = communicator.readRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
                 return;
@@ -361,7 +361,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     String message;
     Handler detailHandler, statusHandler;
 
-    public void onSmartRead() {
+    public void onSmartRead(final Communicator communicator) {
 
         Thread t = new Thread() {
             private void sleep2(int m) {
@@ -375,31 +375,31 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             public void run() {
                 Log.d(TAG, "###########################################################");
                 Log.d(TAG, "Check if Connected!");
-                if (!mDevice.isConnected()) {
+                if (!communicator.isConnected()) {
                     Log.d(TAG, "Not Connected!");
                     Log.d(TAG, "Connect()");
-                    mDevice.connect();
+                    mDevice.connect(communicator);
                     Log.d(TAG, "Wait until connected!");
-                    while (!mDevice.isConnected()) {
+                    while (!communicator.isConnected()) {
                         sleep2(100);
                     }
                     Log.d(TAG, "Connected!");
                 }
 
                 Log.d(TAG, "Check if Open!");
-                if (!mDevice.isOpen()) {
+                if (!communicator.isOpen()) {
                     Log.d(TAG, "Not Open!");
                     Log.d(TAG, "Open()");
-                    mDevice.open();
+                    communicator.open();
                     Log.d(TAG, "Wait until opened!");
-                    while (!mDevice.isOpen()) {
+                    while (!communicator.isOpen()) {
                         sleep2(100);
                     }
                     Log.d(TAG, "Opened()");
                 }
 
                 Log.d(TAG, "Read()");
-                onRead();
+                onRead(communicator);
             }
         };
 
