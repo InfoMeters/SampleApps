@@ -25,9 +25,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
-import com.infometers.devices.Communicator;
+import com.infometers.devices.Device;
 import com.infometers.devices.Converter;
-import com.infometers.sdk.Device;
+import com.infometers.sdk.DeviceManager;
 import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
@@ -56,13 +56,13 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     private ProgressBar mProgressBarConnection;
 
     // SDK handle
-    private Device mDevice = new Device();
+    private DeviceManager mDeviceManager = new DeviceManager();
     private DeviceIds mDeviceId = DeviceIds.OneTouchUltraMini;
 
     //
     private MeterArrayAdapter<Record> mAdapter;
     private static final List<Record> mRecords = new ArrayList<Record>();
-    private Communicator mCommunicator = null;
+    private Device mDevice = null;
 
     //endregion
 
@@ -87,7 +87,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             // SDK : 3 - initialize SerialPort and SDK
             Context context = this;
             OnDeviceListener deviceListener = this;
-            mDevice.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
+            mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -145,7 +145,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     public void onDestroy() {
         try {
             super.onDestroy();
-            mDevice.cleanup();
+            mDeviceManager.cleanup();
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -232,15 +232,15 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
 
     public void onButtonConnectClicked(View v) {
-        mDevice.connect(mCommunicator);
+        mDeviceManager.connect(mDevice);
     }
 
     public void onButtonOpenClicked(View v) {
-        mCommunicator.open();
+        mDevice.open();
     }
 
     public void onButtonReadClicked(View v) {
-        onRead(mCommunicator);
+        onRead(mDevice);
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -252,7 +252,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     public void onButtonSmartReadClicked(View v) {
-        onSmartRead(mCommunicator);
+        onSmartRead(mDevice);
     }
 
     //endregion
@@ -286,10 +286,10 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             return;
 
         mDeviceId = deviceId;
-        mCommunicator = mDevice.createCommunicator(deviceId);
+        mDevice = mDeviceManager.createDevice(deviceId);
         setTitle("Infometers SampleApp2 - " + deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
-        onStatusMessage(String.format("Device Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
+        onStatusMessage(String.format("DeviceManager Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
         setListView(deviceType);
         savePreferences();
     }
@@ -323,9 +323,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         setListAdapter(mAdapter);
     }
 
-    private void onRead(Communicator communicator) {
+    private void onRead(Device device) {
         try {
-            List<Record> records = communicator.readRecords();
+            List<Record> records = device.getRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
                 return;
@@ -361,7 +361,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     String message;
     Handler detailHandler, statusHandler;
 
-    public void onSmartRead(final Communicator communicator) {
+    public void onSmartRead(final Device device) {
 
         Thread t = new Thread() {
             private void sleep2(int m) {
@@ -375,31 +375,31 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             public void run() {
                 Log.d(TAG, "###########################################################");
                 Log.d(TAG, "Check if Connected!");
-                if (!communicator.isConnected()) {
+                if (!device.isConnected()) {
                     Log.d(TAG, "Not Connected!");
                     Log.d(TAG, "Connect()");
-                    mDevice.connect(communicator);
+                    mDeviceManager.connect(device);
                     Log.d(TAG, "Wait until connected!");
-                    while (!communicator.isConnected()) {
+                    while (!device.isConnected()) {
                         sleep2(100);
                     }
                     Log.d(TAG, "Connected!");
                 }
 
                 Log.d(TAG, "Check if Open!");
-                if (!communicator.isOpen()) {
+                if (!device.isOpen()) {
                     Log.d(TAG, "Not Open!");
                     Log.d(TAG, "Open()");
-                    communicator.open();
+                    device.open();
                     Log.d(TAG, "Wait until opened!");
-                    while (!communicator.isOpen()) {
+                    while (!device.isOpen()) {
                         sleep2(100);
                     }
                     Log.d(TAG, "Opened()");
                 }
 
                 Log.d(TAG, "Read()");
-                onRead(communicator);
+                onRead(device);
             }
         };
 

@@ -13,7 +13,8 @@ import android.widget.TextView;
 
 // things from SDK
 import com.infometers.devices.Converter;
-import com.infometers.sdk.Device;
+import com.infometers.devices.Device;
+import com.infometers.sdk.DeviceManager;
 // how do we include just the sdk so we dont have to include other thigns?
 
 // want to not have 
@@ -32,11 +33,11 @@ import com.infometers.records.Record; // generic record class
 import com.infometers.interfaces.OnDeviceListener;
 
 
-
 // SDK : step 1 - DeviceDelegate interface
 public class MainActivity extends Activity implements OnDeviceListener{
 	// SDK : step 2 - Create Instance of SDK
-	Device mDevice = new Device();
+	DeviceManager mDeviceManager = new DeviceManager();
+    Device mDevice = null;
 	private TextView mTextViewStatus;
 	int mProgress = 0;
 	
@@ -62,22 +63,22 @@ public class MainActivity extends Activity implements OnDeviceListener{
 		// Set controls
         //mTextViewStatus = (TextView) findViewById(R.id.textViewStatus);        
         setTitle("Infometers SampleApp1 - " + DeviceIds.OneTouchUltraMini);
-        onStatusMessage("Set Device : " + DeviceIds.OneTouchUltraMini);
+        onStatusMessage("Set DeviceManager : " + DeviceIds.OneTouchUltraMini);
 
 		// SDK : 3 - initialize SerialPort and SDK 
 		Context context = this;
 		OnDeviceListener deviceListener = this;
-        mDevice.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
+        mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
 
         // SDK : step 4 - setDevice for example LifeScan OneTouch Ultra Mini
-        mDevice.setDevice(DeviceIds.OneTouchUltraMini);
+        mDevice = mDeviceManager.createDevice(DeviceIds.OneTouchUltraMini);
 	}
 
 	@Override
 	protected void onDestroy() {
         super.onDestroy();
         // SDK 5 : Add Cleanup
-        mDevice.cleanup();
+        mDeviceManager.cleanup();
 	};
 
 	
@@ -111,7 +112,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
 	
 	public void onButtonConnectClicked(View v){
 		// Sdk : step 6 - call connect function
-		mDevice.connect();// connecting
+		mDeviceManager.connect(mDevice);// connecting
 		// we don't check if it is disconnected
 	}
 
@@ -122,7 +123,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
     }
 	public void onButtonReadClicked(View v){
         // Sdk : step 7 - get records from device
-        List<Record> records = mDevice.readRecords(); // reading records
+        List<Record> records = mDevice.getRecords(); // reading records
         int count = 0;
         if(records != null)
         	count = records.size();
@@ -159,7 +160,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
 		Thread t = new Thread() {
 			public void run() {
 				// Sdk : step 7 - call connect function
-				mDevice.connect();// connecting
+				mDeviceManager.connect(mDevice);// connecting
 				
 				while(status < 2) {}
 				
@@ -168,7 +169,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
 				while(status < 3) {}
 				
 				// Sdk : step 9 - get records from device
-				List<Record> records = mDevice.readRecords(); // reading records
+				List<Record> records = mDevice.getRecords(); // reading records
 				
 				Message detailMsg = new Message();
 				
