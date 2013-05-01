@@ -6,7 +6,7 @@
         <item android:id="@+id/action_onetouch_ultra2" android:title="OneTouchUltra2" android:checkable="true"></item>
         <item android:id="@+id/action_onetouch_ultrasmart" android:title="OneTouchUltraSmart" android:checkable="true"></item>
         <item android:id="@+id/action_and_bloodpressure_us767pc" android:title="AndBloodPressureUS767PC" android:checkable="true"></item>
-        <item android:id="@+id/action_and_scale_uc321pl" android:title="AndScaleUC321PL" android:checkable="true"></item>
+        <item android:id="@+id/action_and_scale_us321pc" android:title="AndScaleUS321PC" android:checkable="true"></item>
         <item android:id="@+id/action_embrace" android:title="Embrace" android:checkable="true"></item>
     </group>
 </menu>
