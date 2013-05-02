@@ -44,6 +44,8 @@ Also include:
     import com.infometers.enums.ConnectionStatus;
     import com.infometers.enums.DeviceIds; // enum of devices types 
     import com.infometers.records.Record; // generic record class
+    import com.infometers.devices.Device;
+    import com.infometers.sdk.DeviceManager;
 
     // only needed if getting String from ConnectionStatus
     import com.infometers.devices.Converter;
@@ -55,8 +57,9 @@ Also include:
 
 ### Step 4: Instantiate Objects
 
-    // SDK : step 4 - Create Instance of SDK Device
-    Device mDevice = new Device();
+    // SDK : step 4 - Create Instance of SDK DeviceManager and Device
+    DeviceManager mDeviceManager = new DeviceManager();
+    Device mDevice;
 
 ### Step 5: Add to OnCreate
 
@@ -67,16 +70,16 @@ NOTE: You need to add your API key string here.
     // SDK : 5 - Initialize SerialPort and SDK 
     Context context = this;
     OnDeviceListener mOnDeviceListener = this;
-    mDevice.init(context, mOnDeviceListener, APIkey); // Please add your key here
+    mDeviceManager.init(context, mOnDeviceListener, APIkey); // Please add your key here
 
     // Manually set the device here
     // SDK : setDevice for example LifeScan OneTouch Ultra Mini
-    mDevice.setDevice(DeviceIds.OneTouchUltraMini);
+    mDevice = mDeviceManager.createDevice(DeviceIds.OneTouchUltraMini);
 
 ### Step 6: Add to OnDestroy
 
     //SDK : step 6 - Add cleanup
-    mDevice.cleanup();
+    mDeviceManager.cleanup();
 
 ### Step 7: Implement OnDeviceListener Functions
 
@@ -101,7 +104,7 @@ These calls need to be inside a separate Thread. The Message object created at t
 This is connected to the big SmartRead button on the bottom.
 
     //SDK : step 8 - establish connection 
-    mDevice.connect();// connecting
+    mDeviceManager.connect(mDevice);// connecting
 
     while(status < 2) {}
 
@@ -111,7 +114,7 @@ This is connected to the big SmartRead button on the bottom.
     while(status < 3) {}
 
     // Sdk : step 10 - get records from device
-    List<Record> records = mDevice.readRecords(); // reading records
+    List<Record> records = mDevice.getRecords(); // reading records
 
     Message detailMsg = new Message();
     detailMsg.obj = records;
@@ -135,7 +138,7 @@ This is connected to three top row buttons.
 
     public void onButtonReadClicked(View v){
           // Sdk : step 10 - get records from device
-          List<Record> records = mDevice.readRecords(); // reading records
+          List<Record> records = mDevice.getRecords(); // reading records
           int count = 0;
           if(records != null)
               count = records.size();
