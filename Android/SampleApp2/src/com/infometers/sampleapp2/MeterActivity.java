@@ -38,12 +38,13 @@ import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
 import com.infometers.helpers.ListHelper;
+import com.infometers.interfaces.OnAddRecordListener;
 import com.infometers.interfaces.OnDeviceListener;
 import com.infometers.records.Record;
 import com.infometers.sdk.DeviceManager;
 
 
-public class MeterActivity extends ListActivity implements OnDeviceListener {
+public class MeterActivity extends ListActivity implements OnDeviceListener, OnAddRecordListener {
 	private static String TAG = "com.infometers.sampleapp2";
 	
 
@@ -231,7 +232,24 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //endregion
 
-    //region Interface DeviceDelegate Implementation
+    //region Interface  - OnAddRecordListener
+
+    @Override
+    public void addRecord(Record record) {
+        try {
+            mRecords.add(record);
+            showRecords();
+            Log.d(TAG, "[STOP] onRead");
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    //endregion
+
+
+
+    //region Interface  - DeviceDelegate
     @Override
     public void onStatusMessage(String status) {
         try {
@@ -257,6 +275,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     //endregion
+
 
 
     public void onButtonConnectClicked(View v) {
