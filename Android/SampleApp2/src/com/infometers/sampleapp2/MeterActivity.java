@@ -11,6 +11,10 @@ package com.infometers.sampleapp2;
  * InfoMeters 2012
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,20 +27,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.infometers.devices.Device;
 import com.infometers.devices.Converter;
-import com.infometers.sdk.DeviceManager;
+import com.infometers.devices.Device;
 import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
+import com.infometers.helpers.ListHelper;
 import com.infometers.interfaces.OnDeviceListener;
 import com.infometers.records.Record;
-import com.infometers.helpers.ListHelper;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.infometers.sdk.DeviceManager;
 
 
 public class MeterActivity extends ListActivity implements OnDeviceListener {
@@ -69,10 +73,6 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //region Constructor
     public MeterActivity() {
-        try {
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
     }
     //endregion
 
@@ -227,6 +227,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     public void onConnectionStatus(ConnectionStatus status) {
         mProgress = Converter.convertToInt(status);
         mProgressBarConnection.setProgress(mProgress);
+		onStatusMessage(status.toString());
     }
 
     //endregion
@@ -241,7 +242,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     public void onButtonReadClicked(View v) {
+    	Log.d(TAG, "[START] onButtonReadClicked");
         onRead(mDevice);
+    	Log.d(TAG, "[STOP] onButtonReadClicked");
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -287,11 +290,15 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             return;
 
         mDeviceId = deviceId;
+
+        ActionBar ab = getActionBar();
+        ab.setTitle("Infometers SampleApp2");
+        ab.setSubtitle(deviceId.toString());        
         mDevice = mDeviceManager.createDevice(deviceId);
-        setTitle("Infometers SampleApp2 - " + deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
-        onStatusMessage(String.format("DeviceManager Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
+        onStatusMessage(String.format("Type=%s", deviceType.toString()));
         setListView(deviceType);
+
         savePreferences();
     }
 
@@ -326,6 +333,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     private void onRead(Device device) {
         try {
+        	Log.d(TAG, "[START] onRead");
             List<Record> records = device.getRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
@@ -333,6 +341,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
             mRecords.addAll(records);
             showRecords();
+        	Log.d(TAG, "[STOP] onRead");
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
