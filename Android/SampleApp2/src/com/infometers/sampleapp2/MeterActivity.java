@@ -154,46 +154,72 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        DeviceIds deviceId = DeviceIds.None;
         try {
-            switch (item.getItemId()) {
-                // If home icon is clicked return to blood_glucose_main Activity
-                case android.R.id.home:
-                    Intent intent = new Intent(this, MeterActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    break;
-                case R.id.action_onetouch_ultramini:
-                    deviceId = DeviceIds.OneTouchUltraMini;
-                    break;
-                case R.id.action_onetouch_select:
-                    deviceId = DeviceIds.OneTouchSelect;
-                    break;
-                case R.id.action_onetouch_ultra2:
-                    deviceId = DeviceIds.OneTouchUltra2;
-                    break;
-                case R.id.action_onetouch_ultrasmart:
-                    deviceId = DeviceIds.OneTouchUltraSmart;
-                    break;
-                case R.id.action_and_bloodpressure_us767pc:
-                    deviceId = DeviceIds.AndBloodPressureUS767PC;
-                    break;
-                case R.id.action_and_scale_uc321pl:
-                    deviceId = DeviceIds.AndScaleUC321PL;
-                    break;
-                case R.id.action_embrace:
-                    deviceId = DeviceIds.Embrace;
-                    break;
-                default:
-                    break;
+            if(item.hasSubMenu())
+                return false;
+
+            DeviceIds deviceId = DeviceIds.None;
+            int itemId = item.getItemId();
+            try {
+                switch (itemId) {
+                    // If home icon is clicked return to blood_glucose_main Activity
+                    case android.R.id.home:
+                        Intent intent = new Intent(this, MeterActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        break;
+                    case R.id.one_touch_ultra_mini:
+                        deviceId = DeviceIds.OneTouchUltraMini;
+                        break;
+                    case R.id.one_touch_select:
+                        deviceId = DeviceIds.OneTouchSelect;
+                        break;
+                    case R.id.one_touch_ultra2:
+                        deviceId = DeviceIds.OneTouchUltra2;
+                        break;
+                    case R.id.one_touch_ultra_smart:
+                        deviceId = DeviceIds.OneTouchUltraSmart;
+                        break;
+                    case R.id.and_blood_pressure_us767pc:
+                        deviceId = DeviceIds.AndBloodPressureUS767PC;
+                        break;
+                    case R.id.and_scale_uc321pl_modeA:
+                        deviceId = DeviceIds.AndScaleUC321PL;
+                        break;
+                    case R.id.and_scale_uc321pl_modeB:
+                        deviceId = DeviceIds.AndScaleUC321PL;
+                        break;
+                    case R.id.embrace:
+                        deviceId = DeviceIds.Embrace;
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
             }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            setDevice(deviceId);
+
+            // Additional Settings
+            if(deviceId == DeviceIds.AndScaleUC321PL){
+                com.infometers.devices.andmedical.uc321pl.Device.Modes mode;
+                if(itemId == R.id.and_scale_uc321pl_modeA){
+                    mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA;
+                }
+                else{
+                    mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeB;
+                }
+                com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+                device.setMode(mode);
+                device.setCommSettings();
+            }
         }
-        setDevice(deviceId);
+        catch (Exception ex){
+            Log.e(TAG, ex.getMessage());
+        }
+
         return true;
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
