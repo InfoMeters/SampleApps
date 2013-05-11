@@ -199,27 +199,36 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
-            setDevice(deviceId);
 
+            setDevice(deviceId);
+            savePreferences();
             // Additional Settings
             if(deviceId == DeviceIds.AndScaleUC321PL){
-                com.infometers.devices.andmedical.uc321pl.Device.Modes mode;
-                if(itemId == R.id.and_scale_uc321pl_modeA){
-                    mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA;
-                }
-                else{
-                    mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeB;
-                }
-                com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
-                device.setMode(mode);
-                device.setCommSettings();
+                boolean isModeA = itemId == R.id.and_scale_uc321pl_modeA;
+                setScaleMode(isModeA);
             }
+            setTitle();
         }
         catch (Exception ex){
             Log.e(TAG, ex.getMessage());
         }
 
         return true;
+    }
+
+
+    private void setScaleMode(boolean isModeA){
+        com.infometers.devices.andmedical.uc321pl.Device.Modes mode;
+        if(isModeA){
+            mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA;
+        }
+        else{
+            mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeB;
+        }
+        com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+        device.setMode(mode);
+        device.setCommSettings();
+        device.setRecordListener(this);
     }
 
     @Override
@@ -316,6 +325,13 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             deviceId = DeviceIds.OneTouchUltraMini;
 
         setDevice(deviceId);
+        // Restore Mode for Scale
+        if(mDeviceId == DeviceIds.AndScaleUC321PL){
+            String sMode = settings.getString("AndScaleUC321PL_Mode", com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
+            boolean isModeA = sMode.equals(com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
+            setScaleMode(isModeA);
+        }
+        setTitle();
     }
 
     private void savePreferences() {
@@ -326,6 +342,13 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("deviceType", mDeviceId.toString());
 
+        // Save Mode for Scale
+        if(mDeviceId == DeviceIds.AndScaleUC321PL){
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+            com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
+            editor.putString("AndScaleUC321PL_Mode", mode.toString());
+        }
+
         // Commit the edits!
         editor.commit();
     }
@@ -335,16 +358,22 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             return;
 
         mDeviceId = deviceId;
-
-        ActionBar ab = getActionBar();
-        ab.setTitle("Infometers SampleApp2");
-        ab.setSubtitle(deviceId.toString());        
         mDevice = mDeviceManager.createDevice(deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
         onStatusMessage(String.format("Type=%s", deviceType.toString()));
         setListView(deviceType);
+    }
 
-        savePreferences();
+    private void setTitle(){
+        ActionBar ab = getActionBar();
+        ab.setTitle("Infometers SampleApp2");
+        String subTitle = mDeviceId.toString();
+        if(mDeviceId == DeviceIds.AndScaleUC321PL){
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+            com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
+            subTitle += " - " + mode.toString();
+        }
+        ab.setSubtitle(subTitle);
     }
 
     private void setListView(DeviceTypes deviceType) {
