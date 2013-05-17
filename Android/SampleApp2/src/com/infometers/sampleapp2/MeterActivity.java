@@ -11,6 +11,9 @@ package com.infometers.sampleapp2;
  * InfoMeters 2012
  */
 
+import java.io.FileNotFoundException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +48,8 @@ import com.infometers.sdk.DeviceManager;
 
 
 public class MeterActivity extends ListActivity implements OnDeviceListener, OnAddRecordListener {
-	private static String TAG = "com.infometers.sampleapp2";
-	
+    private static String TAG = "com.infometers.sampleapp2";
+
 
     //region Static
 
@@ -82,6 +85,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     public void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
+            // catchUncaughtException();
 
             setContentView(R.layout.blood_glucose_main);
             setButtons();
@@ -93,6 +97,19 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    Thread.UncaughtExceptionHandler mUEHandler;
+
+    private void catchUncaughtException() {
+        mUEHandler = new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread.setDefaultUncaughtExceptionHandler(mUEHandler);
     }
 
     private void setButtonStyle(int id, Typeface typeface) {
@@ -156,7 +173,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
-            if(item.hasSubMenu())
+            if (item.hasSubMenu())
                 return false;
 
             DeviceIds deviceId = DeviceIds.None;
@@ -203,13 +220,12 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             setDevice(deviceId);
             savePreferences();
             // Additional Settings
-            if(deviceId == DeviceIds.AndScaleUC321PL){
+            if (deviceId == DeviceIds.AndScaleUC321PL) {
                 boolean isModeA = itemId == R.id.and_scale_uc321pl_modeA;
                 setScaleMode(isModeA);
             }
             setTitle();
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(TAG, ex.getMessage());
         }
 
@@ -217,15 +233,14 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
 
-    private void setScaleMode(boolean isModeA){
+    private void setScaleMode(boolean isModeA) {
         com.infometers.devices.andmedical.uc321pl.Device.Modes mode;
-        if(isModeA){
+        if (isModeA) {
             mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA;
-        }
-        else{
+        } else {
             mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeB;
         }
-        com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+        com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
         device.setMode(mode);
         device.setCommSettings();
         device.setRecordListener(this);
@@ -248,14 +263,12 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         try {
             mRecords.add(record);
             showRecords();
-            Log.d(TAG, "[STOP] onRead");
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
     }
 
     //endregion
-
 
 
     //region Interface  - DeviceDelegate
@@ -280,11 +293,10 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     public void onConnectionStatus(ConnectionStatus status) {
         mProgress = Converter.convertToInt(status);
         mProgressBarConnection.setProgress(mProgress);
-		onStatusMessage(status.toString());
+        onStatusMessage(status.toString());
     }
 
     //endregion
-
 
 
     public void onButtonConnectClicked(View v) {
@@ -296,9 +308,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
     public void onButtonReadClicked(View v) {
-    	Log.d(TAG, "[START] onButtonReadClicked");
+        Log.d(TAG, "[START] onButtonReadClicked");
         onRead(mDevice);
-    	Log.d(TAG, "[STOP] onButtonReadClicked");
+        Log.d(TAG, "[STOP] onButtonReadClicked");
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -326,7 +338,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
         setDevice(deviceId);
         // Restore Mode for Scale
-        if(mDeviceId == DeviceIds.AndScaleUC321PL){
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
             String sMode = settings.getString("AndScaleUC321PL_Mode", com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
             boolean isModeA = sMode.equals(com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
             setScaleMode(isModeA);
@@ -343,8 +355,8 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         editor.putString("deviceType", mDeviceId.toString());
 
         // Save Mode for Scale
-        if(mDeviceId == DeviceIds.AndScaleUC321PL){
-            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
             com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
             editor.putString("AndScaleUC321PL_Mode", mode.toString());
         }
@@ -354,7 +366,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
     private void setDevice(DeviceIds deviceId) {
-        if(deviceId == DeviceIds.None)
+        if (deviceId == DeviceIds.None)
             return;
 
         mDeviceId = deviceId;
@@ -364,12 +376,12 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         setListView(deviceType);
     }
 
-    private void setTitle(){
+    private void setTitle() {
         ActionBar ab = getActionBar();
         ab.setTitle("Infometers SampleApp2");
         String subTitle = mDeviceId.toString();
-        if(mDeviceId == DeviceIds.AndScaleUC321PL){
-            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device)mDevice;
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
             com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
             subTitle += " - " + mode.toString();
         }
@@ -407,7 +419,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
     private void onRead(Device device) {
         try {
-        	Log.d(TAG, "[START] onRead");
+            Log.d(TAG, "[START] onRead");
             List<Record> records = device.getRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
@@ -415,7 +427,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
             mRecords.addAll(records);
             showRecords();
-        	Log.d(TAG, "[STOP] onRead");
+            Log.d(TAG, "[STOP] onRead");
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -434,7 +446,16 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
     private void onClear() {
-        mRecords.clear();
+
+        try {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    mRecords.clear();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
         showRecords();
     }
 

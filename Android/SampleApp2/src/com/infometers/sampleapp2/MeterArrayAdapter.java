@@ -1,12 +1,12 @@
 package com.infometers.sampleapp2;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.infometers.helpers.CalendarHelper;
+import com.infometers.helpers.Log;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
  * this template use File | Settings | File Templates.
  */
 public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
-    private static String TAG = "com.infometers.sampleapp2";
+    protected static Log Log = new Log(true);
 
 	int mTextViewResourceId;
 
@@ -28,6 +28,7 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+        Log.ds();
 		if (convertView == null)
 			convertView = View.inflate(getContext(), mTextViewResourceId, null);
 
@@ -60,6 +61,7 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
                     return row;
 
                 Date date = new Date(r.getDate());
+
                 setValue(convertView, R.id.textViewWeight, r.getWeight());
                 setDateDayValue(convertView, R.id.textViewDate, date);
                 setDateTimeValue(convertView, R.id.textViewTime, date);
@@ -67,34 +69,57 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
             }
         }
         catch (Exception ex){
-            Log.e(TAG, ex.getMessage());
+            Log.e(ex);
         }
 
 		return (row);
 	}
 
-	public static void setValue(View view, int id, String value) {
-		TextView textView = (TextView) view.findViewById(id);
-		textView.setText(value);
-	}
+	public static void setValue(View view, int id, Object value) {
+        try {
+            TextView textView = (TextView) view.findViewById(id);
+            if(textView == null){
+                Log.w(String.format("Can't set TextVIew with id=%d", id));
+                return;
+            }
 
-	public static void setValue(View view, int id, Integer value) {
-		setValue(view, id, value.toString());
+            String sValue = "";
+            if(value != null){
+                Log.w(String.format("Set Value for TextVIew with id=%d is empty", id));
+                sValue = value.toString();
+            }
+            textView.setText(sValue);
+        }
+        catch (Exception ex){
+            Log.e(ex);
+        }
 	}
-    public static void setValue(View view, int id, Double value) {
-        setValue(view, id, value.toString());
-    }
 
 	public static void setDateValue(View view, int id, Date date) {
-		setValue(view, id, CalendarHelper.toString(date));
+        try {
+            setValue(view, id, CalendarHelper.toString(date));
+        }
+        catch (Exception ex){
+            Log.e(ex);
+        }
 	}
 
 	public static void setDateDayValue(View view, int id, Date date) {
-		setValue(view, id, CalendarHelper.toDayString(date));
+        try {
+            setValue(view, id, CalendarHelper.toDayString(date));
+        }
+        catch (Exception ex){
+            Log.e(ex);
+        }
 	}
 
 	public static void setDateTimeValue(View view, int id, Date date) {
-		setValue(view, id, CalendarHelper.toTimeString(date));
+        try {
+            setValue(view, id, CalendarHelper.toTimeString(date));
+        }
+        catch (Exception ex){
+            Log.e(ex);
+        }
 	}
 
 }
