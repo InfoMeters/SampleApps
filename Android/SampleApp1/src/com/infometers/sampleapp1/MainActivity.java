@@ -18,7 +18,6 @@ import com.infometers.sdk.DeviceManager;
 // how do we include just the sdk so we dont have to include other thigns?
 
 // want to not have 
-import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds; // enum of devices types see DeviceIds.Java
 import com.infometers.records.Record; // generic record class
 
@@ -31,6 +30,7 @@ import com.infometers.records.Record; // generic record class
  * interface, might have to have it, designed allow SDK to communicate with UX or just the app that needs the sdk data. (dont have another way)
  */
 import com.infometers.interfaces.OnDeviceListener;
+import com.infometers.serial.enums.ConnectionStatus;
 
 
 // SDK : step 1 - DeviceDelegate interface
