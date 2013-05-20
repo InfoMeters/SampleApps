@@ -39,5 +39,12 @@
             android:text="109" >
     </TextView>
 
+    <!-- Weight -->
+    <TextView
+            android:id="@+id/textViewUnit"
+            style="@style/textViewColumnStyleValues"
+            android:text="lb" >
+    </TextView>
+
 
 </LinearLayout>

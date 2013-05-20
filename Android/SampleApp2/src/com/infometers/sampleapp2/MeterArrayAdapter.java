@@ -20,8 +20,7 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
 
 	int mTextViewResourceId;
 
-	public MeterArrayAdapter(Context context, int textViewResourceId,
-			List<Record> records) {
+	public MeterArrayAdapter(Context context, int textViewResourceId, List<Record> records) {
 		super(context, textViewResourceId, records);
 		mTextViewResourceId = textViewResourceId;
 	}
@@ -62,9 +61,10 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
 
                 Date date = new Date(r.getDate());
 
-                setValue(convertView, R.id.textViewWeight, r.getWeight());
                 setDateDayValue(convertView, R.id.textViewDate, date);
                 setDateTimeValue(convertView, R.id.textViewTime, date);
+                setValue(convertView, R.id.textViewWeight, r.getWeight());
+                setValue(convertView, R.id.textViewUnit, r.getUnit());
 
             }
         }

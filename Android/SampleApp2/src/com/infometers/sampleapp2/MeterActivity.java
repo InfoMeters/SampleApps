@@ -37,7 +37,6 @@ import android.widget.TextView;
 
 import com.infometers.devices.Converter;
 import com.infometers.devices.Device;
-import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
 import com.infometers.helpers.ListHelper;
@@ -45,6 +44,7 @@ import com.infometers.interfaces.OnAddRecordListener;
 import com.infometers.interfaces.OnDeviceListener;
 import com.infometers.records.Record;
 import com.infometers.sdk.DeviceManager;
+import com.infometers.serial.enums.ConnectionStatus;
 
 
 public class MeterActivity extends ListActivity implements OnDeviceListener, OnAddRecordListener {
@@ -413,8 +413,8 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         listView.addHeaderView(mHeader);
         mHeader.setVisibility(View.VISIBLE);
         mAdapter = new MeterArrayAdapter<Record>(this, resourceItem, mRecords);
-        mAdapter.notifyDataSetInvalidated();
         setListAdapter(mAdapter);
+        showRecords();
     }
 
     private void onRead(Device device) {
@@ -437,7 +437,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    mAdapter.notifyDataSetInvalidated();
+                    mAdapter.notifyDataSetChanged();
                 }
             });
         } catch (Exception e) {

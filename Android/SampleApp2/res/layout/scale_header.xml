@@ -19,4 +19,9 @@
             android:text="Weight">
     </TextView>
 
+    <TextView
+            style="@style/textViewColumnHeaderStyle"
+            android:text="Unit">
+    </TextView>
+
 </LinearLayout>
