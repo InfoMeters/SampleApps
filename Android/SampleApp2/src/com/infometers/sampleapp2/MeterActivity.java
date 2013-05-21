@@ -11,9 +11,6 @@ package com.infometers.sampleapp2;
  * InfoMeters 2012
  */
 
-import java.io.FileNotFoundException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +22,6 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +36,7 @@ import com.infometers.devices.Device;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
 import com.infometers.helpers.ListHelper;
+import com.infometers.helpers.Log;
 import com.infometers.interfaces.OnAddRecordListener;
 import com.infometers.interfaces.OnDeviceListener;
 import com.infometers.records.Record;
@@ -48,8 +45,7 @@ import com.infometers.serial.enums.ConnectionStatus;
 
 
 public class MeterActivity extends ListActivity implements OnDeviceListener, OnAddRecordListener {
-    private static String TAG = "com.infometers.sampleapp2";
-
+    protected static Log Log = new Log(true);
 
     //region Static
 
@@ -90,12 +86,12 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             setContentView(R.layout.blood_glucose_main);
             setButtons();
 
-            // SDK : 3 - initialize SerialPort and SDK
+            // SDK : 3 - initialize SerialPortManager and SDK
             Context context = this;
             OnDeviceListener deviceListener = this;
             mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -149,7 +145,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         try {
             super.onStart();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -166,7 +162,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             super.onDestroy();
             mDeviceManager.cleanup();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -214,7 +210,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
                         break;
                 }
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(e);
             }
 
             setDevice(deviceId);
@@ -226,7 +222,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             }
             setTitle();
         } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage());
+            Log.e(ex);
         }
 
         return true;
@@ -264,7 +260,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             mRecords.add(record);
             showRecords();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -282,7 +278,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
 
     }
@@ -300,7 +296,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
 
     public void onButtonConnectClicked(View v) {
-        mDeviceManager.connect(mDevice);
+        mDevice.connect();
     }
 
     public void onButtonOpenClicked(View v) {
@@ -308,9 +304,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
     public void onButtonReadClicked(View v) {
-        Log.d(TAG, "[START] onButtonReadClicked");
+        Log.ds();
         onRead(mDevice);
-        Log.d(TAG, "[STOP] onButtonReadClicked");
+        Log.ds();
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -419,7 +415,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
     private void onRead(Device device) {
         try {
-            Log.d(TAG, "[START] onRead");
+            Log.ds();
             List<Record> records = device.getRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
@@ -427,9 +423,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
             mRecords.addAll(records);
             showRecords();
-            Log.d(TAG, "[STOP] onRead");
+            Log.de();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -441,7 +437,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -454,7 +450,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
         showRecords();
     }
@@ -478,32 +474,32 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             }
 
             public void run() {
-                Log.d(TAG, "###########################################################");
-                Log.d(TAG, "Check if Connected!");
+                Log.d("###########################################################");
+                Log.d("Check if Connected!");
                 if (!device.isConnected()) {
-                    Log.d(TAG, "Not Connected!");
-                    Log.d(TAG, "Connect()");
-                    mDeviceManager.connect(device);
-                    Log.d(TAG, "Wait until connected!");
+                    Log.d("Not Connected!");
+                    Log.d("Connect()");
+                    device.connect();
+                    Log.d("Wait until connected!");
                     while (!device.isConnected()) {
                         sleep2(100);
                     }
-                    Log.d(TAG, "Connected!");
+                    Log.d("Connected!");
                 }
 
-                Log.d(TAG, "Check if Open!");
+                Log.d("Check if Open!");
                 if (!device.isOpen()) {
-                    Log.d(TAG, "Not Open!");
-                    Log.d(TAG, "Open()");
-                    device.open();
-                    Log.d(TAG, "Wait until opened!");
+                    Log.d("Not Open!");
+                    Log.d("Open()");
+                    Log.d("Wait until opened!");
                     while (!device.isOpen()) {
+                        device.open();
                         sleep2(100);
                     }
-                    Log.d(TAG, "Opened()");
+                    Log.d("Opened()");
                 }
 
-                Log.d(TAG, "Read()");
+                Log.d("Read()");
                 onRead(device);
             }
         };

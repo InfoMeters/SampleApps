@@ -25,7 +25,7 @@ import com.infometers.records.Record; // generic record class
 
 /*
  * critcal for letting us know what is going on with SDK in a timely manner. might change it leter.
- * could be non critical maybe, but allows the sdk to notify the UX and user. Otherwise, the App / User level would need to always ask SDK for status and data.
+ * could be non critical maybe, but allows the sdk to notify the UX and user. Otherwise, the App / User level would need to always ask SDK for mStatus and data.
  * when it was designed we had a specific need to be able to deliever data into the UI but now it is not required.
  * interface, might have to have it, designed allow SDK to communicate with UX or just the app that needs the sdk data. (dont have another way)
  */
@@ -36,14 +36,14 @@ import com.infometers.serial.enums.ConnectionStatus;
 // SDK : step 1 - DeviceDelegate interface
 public class MainActivity extends Activity implements OnDeviceListener{
 	// SDK : step 2 - Create Instance of SDK
-	DeviceManager mDeviceManager = new DeviceManager();
-    Device mDevice = null;
+    private DeviceManager mDeviceManager = new DeviceManager();
+    private Device mDevice = null;
 	private TextView mTextViewStatus;
-	int mProgress = 0;
-	
-	String message;
-	int status;
-	Handler detailHandler, statusHandler;
+    private int mProgress = 0;
+    private String mMessage;
+    private int mStatus;
+    private Handler detailHandler;
+    private Handler statusHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
         setTitle("Infometers SampleApp1 - " + DeviceIds.OneTouchUltraMini);
         onStatusMessage("Set DeviceManager : " + DeviceIds.OneTouchUltraMini);
 
-		// SDK : 3 - initialize SerialPort and SDK 
+		// SDK : 3 - initialize SerialPortManager and SDK
 		Context context = this;
 		OnDeviceListener deviceListener = this;
         mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
@@ -88,9 +88,9 @@ public class MainActivity extends Activity implements OnDeviceListener{
 	
 	@Override
 	public void onStatusMessage(String message) {
-        //mTextViewStatus.setText(String.format("[%d] : %s", mProgress, message));
+        //mTextViewStatus.setText(String.format("[%d] : %s", mProgress, mMessage));
 		
-		this.message = message;
+		this.mMessage = message;
 		
 		Message statusMsg = new Message();
 		
@@ -102,17 +102,17 @@ public class MainActivity extends Activity implements OnDeviceListener{
 	@Override
 	public void onConnectionStatus(ConnectionStatus status) {
 		// TODO Auto-generated method stub
-		//mProgress = Converter.convertToInt(status);
-		//onStatusMessage("Connection Progress : " + status);
+		//mProgress = Converter.convertToInt(mStatus);
+		//onStatusMessage("Connection Progress : " + mStatus);
 		
-		this.status = Converter.convertToInt(status);
+		this.mStatus = Converter.convertToInt(status);
 	}
 	
 	// UI activity functions
 	
 	public void onButtonConnectClicked(View v){
 		// Sdk : step 6 - call connect function
-		mDeviceManager.connect(mDevice);// connecting
+		mDevice.connect();// connecting
 		// we don't check if it is disconnected
 	}
 
@@ -160,13 +160,13 @@ public class MainActivity extends Activity implements OnDeviceListener{
 		Thread t = new Thread() {
 			public void run() {
 				// Sdk : step 7 - call connect function
-				mDeviceManager.connect(mDevice);// connecting
+                mDevice.connect();// connecting
 				
-				while(status < 2) {}
+				while(mStatus < 2) {}
 				
 				mDevice.open();
 				
-				while(status < 3) {}
+				while(mStatus < 3) {}
 				
 				// Sdk : step 9 - get records from device
 				List<Record> records = mDevice.getRecords(); // reading records
