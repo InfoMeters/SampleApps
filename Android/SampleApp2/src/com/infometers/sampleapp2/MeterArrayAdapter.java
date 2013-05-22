@@ -18,20 +18,20 @@ import java.util.List;
 public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
     protected static Log Log = new Log(true);
 
-	int mTextViewResourceId;
+    int mTextViewResourceId;
 
-	public MeterArrayAdapter(Context context, int textViewResourceId, List<Record> records) {
-		super(context, textViewResourceId, records);
-		mTextViewResourceId = textViewResourceId;
-	}
+    public MeterArrayAdapter(Context context, int textViewResourceId, List<Record> records) {
+        super(context, textViewResourceId, records);
+        mTextViewResourceId = textViewResourceId;
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
         Log.ds();
-		if (convertView == null)
-			convertView = View.inflate(getContext(), mTextViewResourceId, null);
+        if (convertView == null)
+            convertView = View.inflate(getContext(), mTextViewResourceId, null);
 
-		View row = convertView;
+        View row = convertView;
         try {
             Object item = getItem(position);
             if (item instanceof com.infometers.records.bloodglucose.Record) {
@@ -67,59 +67,56 @@ public class MeterArrayAdapter<Record> extends ArrayAdapter<Record> {
                 setValue(convertView, R.id.textViewUnit, r.getUnit());
 
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(ex);
         }
 
-		return (row);
-	}
+        return (row);
+    }
 
-	public static void setValue(View view, int id, Object value) {
+    public static void setValue(View view, int id, Object value) {
         try {
             TextView textView = (TextView) view.findViewById(id);
-            if(textView == null){
-                Log.w(String.format("Can't set TextVIew with id=%d", id));
+            if (textView == null) {
+                Log.w(String.format("Can't find TextView with id=%d", id));
                 return;
             }
 
+            if (value == null)
+                Log.w(String.format("Set Value for TextView with id=%d is empty", id));
+
             String sValue = "";
-            if(value != null){
-                Log.w(String.format("Set Value for TextVIew with id=%d is empty", id));
+            if (value != null)
                 sValue = value.toString();
-            }
+
             textView.setText(sValue);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(ex);
         }
-	}
+    }
 
-	public static void setDateValue(View view, int id, Date date) {
+    public static void setDateValue(View view, int id, Date date) {
         try {
             setValue(view, id, CalendarHelper.toString(date));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(ex);
         }
-	}
+    }
 
-	public static void setDateDayValue(View view, int id, Date date) {
+    public static void setDateDayValue(View view, int id, Date date) {
         try {
             setValue(view, id, CalendarHelper.toDayString(date));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(ex);
         }
-	}
+    }
 
-	public static void setDateTimeValue(View view, int id, Date date) {
+    public static void setDateTimeValue(View view, int id, Date date) {
         try {
             setValue(view, id, CalendarHelper.toTimeString(date));
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             Log.e(ex);
         }
-	}
+    }
 
 }

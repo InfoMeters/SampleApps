@@ -19,6 +19,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,10 +27,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 
 import com.infometers.devices.Converter;
 import com.infometers.devices.Device;
@@ -73,6 +71,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
     //region Constructor
     public MeterActivity() {
+        com.infometers.helpers.Log.EnabledGlobalLogging(true);
     }
     //endregion
 
@@ -81,9 +80,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     public void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
-            // catchUncaughtException();
+            catchUncaughtException();
 
-            setContentView(R.layout.blood_glucose_main);
+            setContentView(R.layout.activity_main);
             setButtons();
 
             // SDK : 3 - initialize SerialPortManager and SDK
@@ -101,7 +100,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         mUEHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                e.printStackTrace();
+                Log.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Log.e(android.util.Log.getStackTraceString(e));
+                Log.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
         };
 
@@ -126,6 +127,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         setButtonStyle(R.id.deviceRead, typeface);
         setButtonStyle(R.id.clearData, typeface);
         setButtonStyle(R.id.saveData, typeface);
+        setButtonStyle(R.id.buttonSmartRead, typeface);
 
         mTextViewStatus = (TextView) findViewById(R.id.statusValue);
 
@@ -176,7 +178,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             int itemId = item.getItemId();
             try {
                 switch (itemId) {
-                    // If home icon is clicked return to blood_glucose_main Activity
+                    // If home icon is clicked return to activity_main Activity
                     case android.R.id.home:
                         Intent intent = new Intent(this, MeterActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -368,7 +370,6 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         mDeviceId = deviceId;
         mDevice = mDeviceManager.createDevice(deviceId);
         DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
-        onStatusMessage(String.format("Type=%s", deviceType.toString()));
         setListView(deviceType);
     }
 
@@ -387,23 +388,32 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     private void setListView(DeviceTypes deviceType) {
         int resourceHeader = R.layout.blood_glucose_header;
         int resourceItem = R.layout.blood_glucose_item;
+        int resourceImage = R.drawable.diabetes;
+
         switch (deviceType) {
             case BloodGlucose:
                 resourceHeader = R.layout.blood_glucose_header;
                 resourceItem = R.layout.blood_glucose_item;
+                resourceImage = R.drawable.diabetes;
                 break;
             case BloodPressure:
                 resourceHeader = R.layout.blood_pressure_header;
                 resourceItem = R.layout.blood_pressure_item;
+                resourceImage = R.drawable.blood_pressure;
                 break;
             case Scale:
                 resourceHeader = R.layout.scale_header;
                 resourceItem = R.layout.scale_item;
+                resourceImage = R.drawable.body_weight;
                 break;
         }
         ListView listView = getListView();
         if (listView.getHeaderViewsCount() > 0)
             listView.removeHeaderView(mHeader);
+
+        ImageView imageView = (ImageView)findViewById(R.id.imageViewDeviceType);
+        if(imageView != null)
+            imageView.setImageResource(resourceImage);
 
         mHeader = getLayoutInflater().inflate(resourceHeader, null);
         listView.addHeaderView(mHeader);
