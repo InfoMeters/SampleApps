@@ -466,7 +466,20 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     }
 
     private void onExport() {
-        // mUsbDevice.onExport();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,  getExportText());
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
+
+    private String getExportText(){
+        StringBuilder sb = new StringBuilder();
+        for(Record r : mRecords ){
+            sb.append(r.getText());
+            sb.append("\r\n");
+        }
+        return sb.toString();
     }
 
     String message;

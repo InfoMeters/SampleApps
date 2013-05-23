@@ -1,4 +1,4 @@
-package com.infometers.sampleapp2;
+ package com.infometers.sampleapp2;
 
 import android.content.Context;
 import android.view.View;
