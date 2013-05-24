@@ -11,6 +11,9 @@ package com.infometers.sampleapp2;
  * InfoMeters 2012
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -71,7 +75,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
     //region Constructor
     public MeterActivity() {
-        com.infometers.helpers.Log.EnabledGlobalLogging(true);
+        com.infometers.helpers.Log.EnabledGlobalLogging(false);
     }
     //endregion
 
@@ -216,12 +220,12 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
             }
 
             setDevice(deviceId);
-            savePreferences();
             // Additional Settings
             if (deviceId == DeviceIds.AndScaleUC321PL) {
                 boolean isModeA = itemId == R.id.and_scale_uc321pl_modeA;
                 setScaleMode(isModeA);
             }
+            savePreferences();
             setTitle();
         } catch (Exception ex) {
             Log.e(ex);
@@ -411,8 +415,8 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         if (listView.getHeaderViewsCount() > 0)
             listView.removeHeaderView(mHeader);
 
-        ImageView imageView = (ImageView)findViewById(R.id.imageViewDeviceType);
-        if(imageView != null)
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewDeviceType);
+        if (imageView != null)
             imageView.setImageResource(resourceImage);
 
         mHeader = getLayoutInflater().inflate(resourceHeader, null);
@@ -468,16 +472,91 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
     private void onExport() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT,  getExportText());
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getCsvText());
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
     }
 
-    private String getExportText(){
+    private void onExport2() {
+
+        String fileName = getFileName();
+        File file = new File(getFileName());
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            String text = getCsvText();
+            if(text == null)
+                return;
+
+            out.write(text.getBytes());
+            out.close();
+        } catch (IOException e) {
+            Log.e(e.getMessage());
+        }
+        Uri u1 = Uri.fromFile(file);
+
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Person Details");
+        sendIntent.putExtra(Intent.EXTRA_STREAM, u1);
+        sendIntent.setType("text/richtext");
+        startActivity(sendIntent);
+    }
+
+    private String getFileName() {
+        DeviceTypes deviceType = Converter.convertToDeviceType(mDeviceId);
+        String header = "";
+        switch (deviceType) {
+            case BloodGlucose:
+                header = "blood_glucose.csv";
+                break;
+            case BloodPressure:
+                header = "blood_pressure.csv";
+                break;
+            case Scale:
+                header = "weight.csv";
+                break;
+        }
+        return header;
+    }
+
+    private String getReportHeader() {
+        DeviceTypes deviceType = Converter.convertToDeviceType(mDeviceId);
+        String header = "";
+        switch (deviceType) {
+            case BloodGlucose:
+                header = "Date,Blood Glucose";
+                break;
+            case BloodPressure:
+                header = "Date,Systolic,Diastolic,Pulse";
+                break;
+            case Scale:
+                header = "Date,Weight";
+                break;
+        }
+        return header;
+    }
+
+    private void appendLine(StringBuilder sb, String s) {
+        sb.append(s);
+        sb.append("\r\n");
+    }
+
+    private String getExportText() {
         StringBuilder sb = new StringBuilder();
-        for(Record r : mRecords ){
-            sb.append(r.getText());
-            sb.append("\r\n");
+        String header = getReportHeader();
+        appendLine(sb, header);
+        for (Record r : mRecords) {
+            appendLine(sb, r.getText());
+        }
+        return sb.toString();
+    }
+
+    private String getCsvText() {
+        StringBuilder sb = new StringBuilder();
+        String header = getReportHeader();
+        appendLine(sb, header);
+        for (Record r : mRecords) {
+            String s = r.getCsvText();
+            appendLine(sb, s);
         }
         return sb.toString();
     }
