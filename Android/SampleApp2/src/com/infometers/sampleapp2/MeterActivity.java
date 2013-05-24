@@ -236,11 +236,11 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
 
     private void setScaleMode(boolean isModeA) {
-        com.infometers.devices.andmedical.uc321pl.Device.Modes mode;
+        com.infometers.devices.andmedical.uc321pl.Modes mode;
         if (isModeA) {
-            mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA;
+            mode = com.infometers.devices.andmedical.uc321pl.Modes.ModeA;
         } else {
-            mode = com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeB;
+            mode = com.infometers.devices.andmedical.uc321pl.Modes.ModeB;
         }
         com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
         device.setMode(mode);
@@ -341,8 +341,8 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         setDevice(deviceId);
         // Restore Mode for Scale
         if (mDeviceId == DeviceIds.AndScaleUC321PL) {
-            String sMode = settings.getString("AndScaleUC321PL_Mode", com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
-            boolean isModeA = sMode.equals(com.infometers.devices.andmedical.uc321pl.Device.Modes.ModeA.toString());
+            String sMode = settings.getString("AndScaleUC321PL_Mode", com.infometers.devices.andmedical.uc321pl.Modes.ModeA.toString());
+            boolean isModeA = sMode.equals(com.infometers.devices.andmedical.uc321pl.Modes.ModeA.toString());
             setScaleMode(isModeA);
         }
         setTitle();
@@ -359,7 +359,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         // Save Mode for Scale
         if (mDeviceId == DeviceIds.AndScaleUC321PL) {
             com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
-            com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
+            com.infometers.devices.andmedical.uc321pl.Modes mode = device.getMode();
             editor.putString("AndScaleUC321PL_Mode", mode.toString());
         }
 
@@ -383,7 +383,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
         String subTitle = mDeviceId.toString();
         if (mDeviceId == DeviceIds.AndScaleUC321PL) {
             com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
-            com.infometers.devices.andmedical.uc321pl.Device.Modes mode = device.getMode();
+            com.infometers.devices.andmedical.uc321pl.Modes mode = device.getMode();
             subTitle += " - " + mode.toString();
         }
         ab.setSubtitle(subTitle);
