@@ -11,14 +11,22 @@ package com.infometers.sampleapp2;
  * InfoMeters 2012
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,21 +34,20 @@ import android.view.View;
 import android.widget.*;
 
 import com.infometers.devices.Converter;
-import com.infometers.sdk.Device;
-import com.infometers.enums.ConnectionStatus;
+import com.infometers.devices.Device;
 import com.infometers.enums.DeviceIds;
 import com.infometers.enums.DeviceTypes;
+import com.infometers.helpers.ListHelper;
+import com.infometers.helpers.Log;
+import com.infometers.interfaces.OnAddRecordListener;
 import com.infometers.interfaces.OnDeviceListener;
 import com.infometers.records.Record;
-import com.infometers.helpers.ListHelper;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.infometers.sdk.DeviceManager;
+import com.infometers.serial.enums.ConnectionStatus;
 
 
-public class MeterActivity extends ListActivity implements OnDeviceListener {
-	private static String TAG = "com.infometers.sampleapp2";
-	
+public class MeterActivity extends ListActivity implements OnDeviceListener, OnAddRecordListener {
+    protected static Log Log = new Log(true);
 
     //region Static
 
@@ -50,14 +57,17 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //region Private Members
 
+    // SDK handle
+    private DeviceManager mDeviceManager = new DeviceManager();
+    private Device mDevice = null;
+    private DeviceIds mDeviceId = DeviceIds.OneTouchUltraMini;
+
+    // UI
     private TextView mTextViewStatus;
     private View mHeader = null;
     private ProgressBar mProgressBarConnection;
 
-    // SDK handle
-    private Device mDevice = new Device();
-
-    //
+    // DB
     private MeterArrayAdapter<Record> mAdapter;
     private static final List<Record> mRecords = new ArrayList<Record>();
 
@@ -65,10 +75,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //region Constructor
     public MeterActivity() {
-        try {
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
+        com.infometers.helpers.Log.EnabledGlobalLogging(false);
     }
     //endregion
 
@@ -77,17 +84,33 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     public void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
+            catchUncaughtException();
 
-            setContentView(R.layout.blood_glucose_main);
+            setContentView(R.layout.activity_main);
             setButtons();
 
-            // SDK : 3 - initialize SerialPort and SDK
+            // SDK : 3 - initialize SerialPortManager and SDK
             Context context = this;
             OnDeviceListener deviceListener = this;
-            mDevice.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
+            mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
+    }
+
+    Thread.UncaughtExceptionHandler mUEHandler;
+
+    private void catchUncaughtException() {
+        mUEHandler = new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                Log.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Log.e(android.util.Log.getStackTraceString(e));
+                Log.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+        };
+
+        Thread.setDefaultUncaughtExceptionHandler(mUEHandler);
     }
 
     private void setButtonStyle(int id, Typeface typeface) {
@@ -108,6 +131,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         setButtonStyle(R.id.deviceRead, typeface);
         setButtonStyle(R.id.clearData, typeface);
         setButtonStyle(R.id.saveData, typeface);
+        setButtonStyle(R.id.buttonSmartRead, typeface);
 
         mTextViewStatus = (TextView) findViewById(R.id.statusValue);
 
@@ -127,7 +151,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         try {
             super.onStart();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -135,7 +159,6 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     protected void onResume() {
         super.onResume();
         restorePreferences();
-        setDevice();
         showRecords();
     }
 
@@ -143,53 +166,87 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     public void onDestroy() {
         try {
             super.onDestroy();
-            mDevice.cleanup();
+            mDeviceManager.cleanup();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
-            switch (item.getItemId()) {
-                // If home icon is clicked return to blood_glucose_main Activity
-                case android.R.id.home:
-                    Intent intent = new Intent(this, MeterActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    break;
-                case R.id.action_onetouch_ultramini:
-                    setDevice(DeviceIds.OneTouchUltraMini);
-                    break;
-                case R.id.action_onetouch_select:
-                    setDevice(DeviceIds.OneTouchSelect);
-                    break;
-                case R.id.action_onetouch_ultra2:
-                    setDevice(DeviceIds.OneTouchUltra2);
-                    break;
-                case R.id.action_onetouch_ultrasmart:
-                    setDevice(DeviceIds.OneTouchUltraSmart);
-                    break;
-                case R.id.action_and_bloodpressure_us767pc:
-                    setDevice(DeviceIds.AndBloodPressureUS767PC);
-                    break;
-                case R.id.action_and_scale_us321pc:
-                    setDevice(DeviceIds.AndScaleUS321PC);
-                    break;
-                case R.id.action_embrace:
-                    setDevice(DeviceIds.Embrace);
-                    break;
-                default:
-                    break;
+            if (item.hasSubMenu())
+                return false;
+
+            DeviceIds deviceId = DeviceIds.None;
+            int itemId = item.getItemId();
+            try {
+                switch (itemId) {
+                    // If home icon is clicked return to activity_main Activity
+                    case android.R.id.home:
+                        Intent intent = new Intent(this, MeterActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        break;
+                    case R.id.one_touch_ultra_mini:
+                        deviceId = DeviceIds.OneTouchUltraMini;
+                        break;
+                    case R.id.one_touch_select:
+                        deviceId = DeviceIds.OneTouchSelect;
+                        break;
+                    case R.id.one_touch_ultra2:
+                        deviceId = DeviceIds.OneTouchUltra2;
+                        break;
+                    case R.id.one_touch_ultra_smart:
+                        deviceId = DeviceIds.OneTouchUltraSmart;
+                        break;
+                    case R.id.and_blood_pressure_us767pc:
+                        deviceId = DeviceIds.AndBloodPressureUS767PC;
+                        break;
+                    case R.id.and_scale_uc321pl_modeA:
+                        deviceId = DeviceIds.AndScaleUC321PL;
+                        break;
+                    case R.id.and_scale_uc321pl_modeB:
+                        deviceId = DeviceIds.AndScaleUC321PL;
+                        break;
+                    case R.id.embrace:
+                        deviceId = DeviceIds.Embrace;
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                Log.e(e);
             }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+
+            setDevice(deviceId);
+            // Additional Settings
+            if (deviceId == DeviceIds.AndScaleUC321PL) {
+                boolean isModeA = itemId == R.id.and_scale_uc321pl_modeA;
+                setScaleMode(isModeA);
+            }
+            savePreferences();
+            setTitle();
+        } catch (Exception ex) {
+            Log.e(ex);
         }
 
         return true;
     }
 
+
+    private void setScaleMode(boolean isModeA) {
+        com.infometers.devices.andmedical.uc321pl.Modes mode;
+        if (isModeA) {
+            mode = com.infometers.devices.andmedical.uc321pl.Modes.ModeA;
+        } else {
+            mode = com.infometers.devices.andmedical.uc321pl.Modes.ModeB;
+        }
+        com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
+        device.setMode(mode);
+        device.setCommSettings();
+        device.setRecordListener(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -201,7 +258,22 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
 
     //endregion
 
-    //region Interface DeviceDelegate Implementation
+    //region Interface  - OnAddRecordListener
+
+    @Override
+    public void addRecord(Record record) {
+        try {
+            mRecords.add(record);
+            showRecords();
+        } catch (Exception e) {
+            Log.e(e);
+        }
+    }
+
+    //endregion
+
+
+    //region Interface  - DeviceDelegate
     @Override
     public void onStatusMessage(String status) {
         try {
@@ -212,7 +284,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
 
     }
@@ -223,6 +295,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     public void onConnectionStatus(ConnectionStatus status) {
         mProgress = Converter.convertToInt(status);
         mProgressBarConnection.setProgress(mProgress);
+        onStatusMessage(status.toString());
     }
 
     //endregion
@@ -237,7 +310,9 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     public void onButtonReadClicked(View v) {
-        onRead();
+        Log.ds();
+        onRead(mDevice);
+        Log.ds();
     }
 
     public void onButtonClearDataClicked(View v) {
@@ -249,7 +324,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
     }
 
     public void onButtonSmartReadClicked(View v) {
-        onSmartRead();
+        onSmartRead(mDevice);
     }
 
     //endregion
@@ -263,7 +338,14 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         if (deviceId == DeviceIds.None)
             deviceId = DeviceIds.OneTouchUltraMini;
 
-        mDevice.setDevice(deviceId);
+        setDevice(deviceId);
+        // Restore Mode for Scale
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
+            String sMode = settings.getString("AndScaleUC321PL_Mode", com.infometers.devices.andmedical.uc321pl.Modes.ModeA.toString());
+            boolean isModeA = sMode.equals(com.infometers.devices.andmedical.uc321pl.Modes.ModeA.toString());
+            setScaleMode(isModeA);
+        }
+        setTitle();
     }
 
     private void savePreferences() {
@@ -272,62 +354,92 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         // All objects are from android.context.Context
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("deviceType", mDevice.getDeviceId().toString());
+        editor.putString("deviceType", mDeviceId.toString());
+
+        // Save Mode for Scale
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
+            com.infometers.devices.andmedical.uc321pl.Modes mode = device.getMode();
+            editor.putString("AndScaleUC321PL_Mode", mode.toString());
+        }
 
         // Commit the edits!
         editor.commit();
     }
 
     private void setDevice(DeviceIds deviceId) {
-        mDevice.setDevice(deviceId);
-        setDevice();
+        if (deviceId == DeviceIds.None)
+            return;
+
+        mDeviceId = deviceId;
+        mDevice = mDeviceManager.createDevice(deviceId);
+        DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
+        setListView(deviceType);
     }
 
-    private void setDevice() {
-        DeviceIds deviceId = mDevice.getDeviceId();
-        setTitle("Infometers SampleApp2 - " + deviceId);
-        DeviceTypes deviceType = Converter.convertToDeviceType(deviceId);
-        onStatusMessage(String.format("Device Type=%s, Id=%s", deviceType.toString(), deviceId.toString()));
-        setListView(deviceType);
-        savePreferences();
+    private void setTitle() {
+        ActionBar ab = getActionBar();
+        ab.setTitle("Infometers SampleApp2");
+        String subTitle = mDeviceId.toString();
+        if (mDeviceId == DeviceIds.AndScaleUC321PL) {
+            com.infometers.devices.andmedical.uc321pl.Device device = (com.infometers.devices.andmedical.uc321pl.Device) mDevice;
+            com.infometers.devices.andmedical.uc321pl.Modes mode = device.getMode();
+            subTitle += " - " + mode.toString();
+        }
+        ab.setSubtitle(subTitle);
     }
 
     private void setListView(DeviceTypes deviceType) {
         int resourceHeader = R.layout.blood_glucose_header;
         int resourceItem = R.layout.blood_glucose_item;
+        int resourceImage = R.drawable.diabetes;
+
         switch (deviceType) {
             case BloodGlucose:
                 resourceHeader = R.layout.blood_glucose_header;
                 resourceItem = R.layout.blood_glucose_item;
+                resourceImage = R.drawable.diabetes;
                 break;
             case BloodPressure:
                 resourceHeader = R.layout.blood_pressure_header;
                 resourceItem = R.layout.blood_pressure_item;
+                resourceImage = R.drawable.blood_pressure;
+                break;
+            case Scale:
+                resourceHeader = R.layout.scale_header;
+                resourceItem = R.layout.scale_item;
+                resourceImage = R.drawable.body_weight;
                 break;
         }
         ListView listView = getListView();
         if (listView.getHeaderViewsCount() > 0)
             listView.removeHeaderView(mHeader);
 
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewDeviceType);
+        if (imageView != null)
+            imageView.setImageResource(resourceImage);
+
         mHeader = getLayoutInflater().inflate(resourceHeader, null);
         listView.addHeaderView(mHeader);
         mHeader.setVisibility(View.VISIBLE);
         mAdapter = new MeterArrayAdapter<Record>(this, resourceItem, mRecords);
-        mAdapter.notifyDataSetInvalidated();
         setListAdapter(mAdapter);
+        showRecords();
     }
 
-    private void onRead() {
+    private void onRead(Device device) {
         try {
-            List<Record> records = mDevice.readRecords();
+            Log.ds();
+            List<Record> records = device.getRecords();
             mRecords.clear();
             if (ListHelper.isNullOrEmpty(records))
                 return;
 
             mRecords.addAll(records);
             showRecords();
+            Log.de();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
@@ -335,27 +447,124 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    mAdapter.notifyDataSetInvalidated();
+                    mAdapter.notifyDataSetChanged();
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(e);
         }
     }
 
     private void onClear() {
-        mRecords.clear();
+
+        try {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    mRecords.clear();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(e);
+        }
         showRecords();
     }
 
     private void onExport() {
-        // mDevice.onExport();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getCsvText());
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
+
+    private void onExport2() {
+
+        String fileName = getFileName();
+        File file = new File(getFileName());
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            String text = getCsvText();
+            if(text == null)
+                return;
+
+            out.write(text.getBytes());
+            out.close();
+        } catch (IOException e) {
+            Log.e(e.getMessage());
+        }
+        Uri u1 = Uri.fromFile(file);
+
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Person Details");
+        sendIntent.putExtra(Intent.EXTRA_STREAM, u1);
+        sendIntent.setType("text/richtext");
+        startActivity(sendIntent);
+    }
+
+    private String getFileName() {
+        DeviceTypes deviceType = Converter.convertToDeviceType(mDeviceId);
+        String header = "";
+        switch (deviceType) {
+            case BloodGlucose:
+                header = "blood_glucose.csv";
+                break;
+            case BloodPressure:
+                header = "blood_pressure.csv";
+                break;
+            case Scale:
+                header = "weight.csv";
+                break;
+        }
+        return header;
+    }
+
+    private String getReportHeader() {
+        DeviceTypes deviceType = Converter.convertToDeviceType(mDeviceId);
+        String header = "";
+        switch (deviceType) {
+            case BloodGlucose:
+                header = "Date,Blood Glucose";
+                break;
+            case BloodPressure:
+                header = "Date,Systolic,Diastolic,Pulse";
+                break;
+            case Scale:
+                header = "Date,Weight";
+                break;
+        }
+        return header;
+    }
+
+    private void appendLine(StringBuilder sb, String s) {
+        sb.append(s);
+        sb.append("\r\n");
+    }
+
+    private String getExportText() {
+        StringBuilder sb = new StringBuilder();
+        String header = getReportHeader();
+        appendLine(sb, header);
+        for (Record r : mRecords) {
+            appendLine(sb, r.getText());
+        }
+        return sb.toString();
+    }
+
+    private String getCsvText() {
+        StringBuilder sb = new StringBuilder();
+        String header = getReportHeader();
+        appendLine(sb, header);
+        for (Record r : mRecords) {
+            String s = r.getCsvText();
+            appendLine(sb, s);
+        }
+        return sb.toString();
     }
 
     String message;
     Handler detailHandler, statusHandler;
 
-    public void onSmartRead() {
+    public void onSmartRead(final Device device) {
 
         Thread t = new Thread() {
             private void sleep2(int m) {
@@ -367,33 +576,33 @@ public class MeterActivity extends ListActivity implements OnDeviceListener {
             }
 
             public void run() {
-                Log.d(TAG, "###########################################################");
-                Log.d(TAG, "Check if Connected!");
-                if (!mDevice.isConnected()) {
-                    Log.d(TAG, "Not Connected!");
-                    Log.d(TAG, "Connect()");
-                    mDevice.connect();
-                    Log.d(TAG, "Wait until connected!");
-                    while (!mDevice.isConnected()) {
+                Log.d("###########################################################");
+                Log.d("Check if Connected!");
+                if (!device.isConnected()) {
+                    Log.d("Not Connected!");
+                    Log.d("Connect()");
+                    device.connect();
+                    Log.d("Wait until connected!");
+                    while (!device.isConnected()) {
                         sleep2(100);
                     }
-                    Log.d(TAG, "Connected!");
+                    Log.d("Connected!");
                 }
 
-                Log.d(TAG, "Check if Open!");
-                if (!mDevice.isOpen()) {
-                    Log.d(TAG, "Not Open!");
-                    Log.d(TAG, "Open()");
-                    mDevice.open();
-                    Log.d(TAG, "Wait until opened!");
-                    while (!mDevice.isOpen()) {
+                Log.d("Check if Open!");
+                if (!device.isOpen()) {
+                    Log.d("Not Open!");
+                    Log.d("Open()");
+                    Log.d("Wait until opened!");
+                    while (!device.isOpen()) {
+                        device.open();
                         sleep2(100);
                     }
-                    Log.d(TAG, "Opened()");
+                    Log.d("Opened()");
                 }
 
-                Log.d(TAG, "Read()");
-                onRead();
+                Log.d("Read()");
+                onRead(device);
             }
         };
 

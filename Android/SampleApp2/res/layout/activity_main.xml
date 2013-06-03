@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:text="Smart Read"
                 android:onClick="onButtonSmartReadClicked"
-                />
+                android:hint="Connect + Open + Read"/>
         <Button
                 android:id="@+id/clearData"
                 android:layout_width="0px"
@@ -118,6 +118,11 @@
             android:layout_margin="3dip"
             android:orientation="horizontal">
 
+        <ImageView
+                android:layout_width="28dp"
+                android:layout_height="match_parent"
+                android:id="@+id/imageViewDeviceType"
+                android:src="@drawable/blood_pressure"/>
         <TextView
                 android:id="@+id/statusValue"
                 android:layout_width="fill_parent"

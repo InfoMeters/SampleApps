@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/action_onetouch_ultramini" android:title="OneTouchUltraMini" android:checkable="true"></item>
-        <item android:id="@+id/action_onetouch_select" android:title="OneTouchSelect" android:checkable="true"></item>
-        <item android:id="@+id/action_onetouch_ultra2" android:title="OneTouchUltra2" android:checkable="true"></item>
-        <item android:id="@+id/action_onetouch_ultrasmart" android:title="OneTouchUltraSmart" android:checkable="true"></item>
-        <item android:id="@+id/action_and_bloodpressure_us767pc" android:title="AndBloodPressureUS767PC" android:checkable="true"></item>
-        <item android:id="@+id/action_and_scale_us321pc" android:title="AndScaleUS321PC" android:checkable="true"></item>
-        <item android:id="@+id/action_embrace" android:title="Embrace" android:checkable="true"></item>
-    </group>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Blood Glucose">
+        <menu>
+            <item android:id="@+id/one_touch_ultra_mini" android:title="OneTouch UltraMini"></item>
+            <item android:id="@+id/one_touch_select" android:title="OneTouch Select"></item>
+            <item android:id="@+id/one_touch_ultra2" android:title="OneTouch Ultra2"></item>
+            <item android:id="@+id/one_touch_ultra_smart" android:title="OneTouch UltraSmart"></item>
+            <item android:id="@+id/embrace" android:title="Embrace"></item>
+        </menu>
+    </item>
+    <item android:title="Blood Pressure">
+        <menu>
+            <item android:id="@+id/and_blood_pressure_us767pc" android:title="A&amp;D US767PC"></item>
+        </menu>
+    </item>
+    <item android:title="Scale">
+        <menu>
+            <item android:title="A&amp;D UC321PL">
+                <menu>
+                    <item android:id="@+id/and_scale_uc321pl_modeA" android:title="ModeA"></item>
+                    <item android:id="@+id/and_scale_uc321pl_modeB" android:title="ModeB"></item>
+                </menu>
+            </item>
+        </menu>
+    </item>
 </menu>

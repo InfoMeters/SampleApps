@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 // things from SDK
 import com.infometers.devices.Converter;
-import com.infometers.sdk.Device;
+import com.infometers.devices.Device;
+import com.infometers.sdk.DeviceManager;
 // how do we include just the sdk so we dont have to include other thigns?
 
 // want to not have 
-import com.infometers.enums.ConnectionStatus;
 import com.infometers.enums.DeviceIds; // enum of devices types see DeviceIds.Java
 import com.infometers.records.Record; // generic record class
 
@@ -25,24 +25,25 @@ import com.infometers.records.Record; // generic record class
 
 /*
  * critcal for letting us know what is going on with SDK in a timely manner. might change it leter.
- * could be non critical maybe, but allows the sdk to notify the UX and user. Otherwise, the App / User level would need to always ask SDK for status and data.
+ * could be non critical maybe, but allows the sdk to notify the UX and user. Otherwise, the App / User level would need to always ask SDK for mStatus and data.
  * when it was designed we had a specific need to be able to deliever data into the UI but now it is not required.
  * interface, might have to have it, designed allow SDK to communicate with UX or just the app that needs the sdk data. (dont have another way)
  */
 import com.infometers.interfaces.OnDeviceListener;
-
+import com.infometers.serial.enums.ConnectionStatus;
 
 
 // SDK : step 1 - DeviceDelegate interface
 public class MainActivity extends Activity implements OnDeviceListener{
 	// SDK : step 2 - Create Instance of SDK
-	Device mDevice = new Device();
+    private DeviceManager mDeviceManager = new DeviceManager();
+    private Device mDevice = null;
 	private TextView mTextViewStatus;
-	int mProgress = 0;
-	
-	String message;
-	int status;
-	Handler detailHandler, statusHandler;
+    private int mProgress = 0;
+    private String mMessage;
+    private int mStatus;
+    private Handler detailHandler;
+    private Handler statusHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,22 +63,22 @@ public class MainActivity extends Activity implements OnDeviceListener{
 		// Set controls
         //mTextViewStatus = (TextView) findViewById(R.id.textViewStatus);        
         setTitle("Infometers SampleApp1 - " + DeviceIds.OneTouchUltraMini);
-        onStatusMessage("Set Device : " + DeviceIds.OneTouchUltraMini);
+        onStatusMessage("Set DeviceManager : " + DeviceIds.OneTouchUltraMini);
 
-		// SDK : 3 - initialize SerialPort and SDK 
+		// SDK : 3 - initialize SerialPortManager and SDK
 		Context context = this;
 		OnDeviceListener deviceListener = this;
-        mDevice.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
+        mDeviceManager.init(context, deviceListener, "REPLACE_WITH_API_KEY"); // context , delegate
 
         // SDK : step 4 - setDevice for example LifeScan OneTouch Ultra Mini
-        mDevice.setDevice(DeviceIds.OneTouchUltraMini);
+        mDevice = mDeviceManager.createDevice(DeviceIds.OneTouchUltraMini);
 	}
 
 	@Override
 	protected void onDestroy() {
         super.onDestroy();
         // SDK 5 : Add Cleanup
-        mDevice.cleanup();
+        mDeviceManager.cleanup();
 	};
 
 	
@@ -87,9 +88,9 @@ public class MainActivity extends Activity implements OnDeviceListener{
 	
 	@Override
 	public void onStatusMessage(String message) {
-        //mTextViewStatus.setText(String.format("[%d] : %s", mProgress, message));
+        //mTextViewStatus.setText(String.format("[%d] : %s", mProgress, mMessage));
 		
-		this.message = message;
+		this.mMessage = message;
 		
 		Message statusMsg = new Message();
 		
@@ -101,10 +102,10 @@ public class MainActivity extends Activity implements OnDeviceListener{
 	@Override
 	public void onConnectionStatus(ConnectionStatus status) {
 		// TODO Auto-generated method stub
-		//mProgress = Converter.convertToInt(status);
-		//onStatusMessage("Connection Progress : " + status);
+		//mProgress = Converter.convertToInt(mStatus);
+		//onStatusMessage("Connection Progress : " + mStatus);
 		
-		this.status = Converter.convertToInt(status);
+		this.mStatus = Converter.convertToInt(status);
 	}
 	
 	// UI activity functions
@@ -122,7 +123,7 @@ public class MainActivity extends Activity implements OnDeviceListener{
     }
 	public void onButtonReadClicked(View v){
         // Sdk : step 7 - get records from device
-        List<Record> records = mDevice.readRecords(); // reading records
+        List<Record> records = mDevice.getRecords(); // reading records
         int count = 0;
         if(records != null)
         	count = records.size();
@@ -159,16 +160,16 @@ public class MainActivity extends Activity implements OnDeviceListener{
 		Thread t = new Thread() {
 			public void run() {
 				// Sdk : step 7 - call connect function
-				mDevice.connect();// connecting
+                mDevice.connect();// connecting
 				
-				while(status < 2) {}
+				while(mStatus < 2) {}
 				
 				mDevice.open();
 				
-				while(status < 3) {}
+				while(mStatus < 3) {}
 				
 				// Sdk : step 9 - get records from device
-				List<Record> records = mDevice.readRecords(); // reading records
+				List<Record> records = mDevice.getRecords(); // reading records
 				
 				Message detailMsg = new Message();
 				
