@@ -4,7 +4,7 @@
 
 1.  Download the **SDK Package** and place `infometers-android-sdk.jar` into the `libs` folder in your project.
 
-2.  Set up the **InfoMeters SDK** by going thru the steps below. (See Version I: Making a new app and/or Version II: Adding to your app)
+2.  Set up the **InfoMeters SDK** by going thru the steps below. (See Case I: Making a new app and/or Case II: Adding to your app)
 
 3.  Test your application by **reading data** into your **app** from medical monitoring device(s).
 
@@ -12,10 +12,10 @@
 
 Here we describe the simple, several step process to enabling the InfoMeters SDK to push  medical device data to your application or service.
 
-**Version 1**: explains how to create an application from scratch with InfoMeters SDK. The resulting application code is included in the SampleApp1 folder.
+**Case 1**: explains how to create an application from scratch with InfoMeters SDK. The resulting application code is included in the SampleApp1 folder.
 
 
-## Version I: Empty App: (Sample App1)
+## Case I: Empty App: (Sample App1)
 
 ### Step 1: Add Permissions to AndroidManifest.xml
 
@@ -163,8 +163,8 @@ This is connected to three top row buttons.
 
     }
 
-## Version 2:
+## Case 2:
 
-Version 2 explains how to add the InfoMeters SDK to an existing app. The resulting application code is included in the SampleApp2 folder.
+Case 2 explains how to add the InfoMeters SDK to an existing app. The resulting application code is included in the SampleApp2 folder.
 
 Coming soon...
