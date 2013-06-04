@@ -14,6 +14,9 @@ Here we describe the simple, several step process to enabling the InfoMeters SDK
 
 **Case 1**: explains how to create an application from scratch with InfoMeters SDK. The resulting application code is included in the SampleApp1 folder.
 
+## Wireless Debugging
+
+Developing apps that utilize the InfoMeters SDK (and therefore the USB host capabilities of Android) may require the use of wireless debugging. Refer to the section entitled "Debugging Considerations" on [this page](http://developer.android.com/guide/topics/connectivity/usb/index.html) for further information. If your phone is rooted, you may find it more convenient to use an app such as [ADB Konnect](https://play.google.com/store/apps/details?id=com.rockolabs.adbkonnect&hl=en) instead.
 
 ## Case I: Empty App: (Sample App1)
 
