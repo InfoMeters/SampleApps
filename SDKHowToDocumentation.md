@@ -37,11 +37,11 @@ Also include:
 
     // SDK : step 2 - include statements
     import android.content.Context;
+    import android.os.Message;
     import java.util.List;
 
     import com.infometers.interfaces.OnDeviceListener;
-    import com.infometers.meterlib.*;
-    import com.infometers.enums.ConnectionStatus;
+    import com.infometers.serial.enums.ConnectionStatus;
     import com.infometers.enums.DeviceIds; // enum of devices types 
     import com.infometers.records.Record; // generic record class
     import com.infometers.devices.Device;
@@ -55,11 +55,13 @@ Also include:
     // SDK : step 3 - OnDeviceListener interface
     public class MainActivity extends Activity implements OnDeviceListener{
 
-### Step 4: Instantiate Objects
+### Step 4: Instantiate class variables
 
     // SDK : step 4 - Create Instance of SDK DeviceManager and Device
     DeviceManager mDeviceManager = new DeviceManager();
     Device mDevice;
+    String message;
+    int status;
 
 ### Step 5: Add to OnCreate
 
@@ -89,12 +91,12 @@ NOTE: You need to add your API key string here.
       Message statusMsg = new Message();
       statusMsg.obj = message;
 
-      //statusHandler described in onCreate, sets the statusTextView in SampleApp1
-    statusHandler.sendMessage(statusMsg); 
+      //statusHandler described in onCreate in SampleApp1, sets the statusTextView
+      statusHandler.sendMessage(statusMsg); 
     }
 
-    public void onConnectionProgress (ConnectionStatus status){
-    this.status = Converter.convertToInt(status);
+    public void onConnectionStatus(ConnectionStatus status){
+      this.status = Converter.convertToInt(status);
     }
 
 ### Step 8-10: SmartRead: Use one click to connect to device, open connection, and read data
