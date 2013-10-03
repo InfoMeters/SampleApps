@@ -302,7 +302,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
 
 
     public void onButtonConnectClicked(View v) {
-        mDevice.connect();
+        mDeviceManager.connect();
     }
 
     public void onButtonOpenClicked(View v) {
@@ -581,7 +581,7 @@ public class MeterActivity extends ListActivity implements OnDeviceListener, OnA
                 if (!device.isConnected()) {
                     Log.d("Not Connected!");
                     Log.d("Connect()");
-                    device.connect();
+                    mDeviceManager.connect();
                     Log.d("Wait until connected!");
                     while (!device.isConnected()) {
                         sleep2(100);
